@@ -1,0 +1,169 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Text editor-Version1.0</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+  <!--............................................................... Inline style tag.................................................-->
+	
+ <style type="text/css">
+body {
+  position: relative;
+}
+#tooltip {
+  display: none;
+  position: fixed;
+  background: black;
+  color: white;
+  width: 120px;
+  font-size: 2em;
+  border-radius: 4px;
+  top: 10px;
+  right: 150px;
+}
+.tooltip-option {
+  margin-left: 10px;
+  cursor: pointer;
+}
+</style>
+
+			<!--...............................................................script tag.................................................-->
+	
+
+	<script type="text/javascript">
+
+		function view_text () {
+			// Find html elements.
+			var textArea = document.getElementById('my_text');
+			var div = document.getElementById('view_text');
+			//alternative anchor "<a></a>" tag display
+				$(document).ready(function(){
+    $("a:odd").css("color", "red");//for odd number of links
+    $("a:even").css("color", "green");//for even number of links
+});
+       
+			// Put the text in a variable so we can manipulate it.
+			var text = textArea.value;
+			
+			// Make sure html and php tags are unusable by disabling < and >.
+			text = text.replace(/\</gi, "<");
+			text = text.replace(/\>/gi, ">");
+			
+			// Exchange newlines for <br />
+			text = text.replace(/\n/gi, "<br />");
+			
+			// Basic BBCodes.
+			text = text.replace(/\[b\]/gi, "<b>");
+			text = text.replace(/\[\/b\]/gi, "</b>");
+
+
+			text = text.replace(/\[i\]/gi, "<i>");
+			text = text.replace(/\[\/i\]/gi, "</i>");
+			
+
+			text = text.replace(/\[u\]/gi, "<u>");
+			text = text.replace(/\[\/u\]/gi, "</u>");
+			
+			// Print the text in the div made for it.
+			div.innerHTML = text;
+		}
+		
+		function mod_selection (val1,val2) {
+			// Get the text area
+			var textArea = document.getElementById('my_text');
+			
+			// IE specific code.
+			if( -1 != navigator.userAgent.indexOf ("MSIE") ) { 
+				
+				var range = document.selection.createRange();
+				var stored_range = range.duplicate();
+				
+				if(stored_range.length > 0) {
+					stored_range.moveToElementText(textArea);
+					stored_range.setEndPoint('EndToEnd', range);
+					textArea.selectionstart = stored_range.text.length - range.text.length;
+					textArea.selectionend = textArea.selectionstart + range.text.length;
+				}
+			}
+			// Do we even have a selection?
+			if (typeof(textArea.selectionstart) != "undefined") {
+				// Split the text in three pieces - the selection, and what comes before and after.
+				var begin = textArea.value.substr(0, textArea.selectionstart);
+				var selection = textArea.value.substr(textArea.selectionstart, textArea.selectionend - textArea.selectionstart);
+				var end = textArea.value.substr(textArea.selectionend);
+				
+				// Insert the tags between the three pieces of text.
+				textArea.value = begin + val1 + selection + val2 + end;
+			}
+		}
+
+
+	</script>
+	
+	
+</head>
+<body>
+	<br />
+	
+	<!-- Text area -->
+	<textarea class="text_edit" id="my_text">
+
+</textarea>
+	<br />
+
+	<!-- Submit button -->
+	<input type="button" value="Show text" onclick="view_text()" />
+	<!-- Empty div to put the text in -->
+	<p id="view_text" contenteditable="true">
+	
+</p>
+       <!--tooltip body styling-->
+		<div id="tooltip">
+    <button id="bold" class="tooltip-option">bold</button>
+    <button id="underline" class="tooltip-option">underline</button>
+    <button id="italic" class="tooltip-option">italic</button>
+    <button id="undo" class="tooltip-option">undo</button>
+    <button onclick='turnRed()'>red</button>
+  </div>
+
+
+<script>
+
+//change the text color to red on button(red) click
+function turnRed() {
+var myPara = document.getElementById("view_text");
+myPara.style.color = "red";
+}
+
+// double click  on tooltip,it will disapper from screen
+$(document).ready(function(){
+    $("div").dblclick(function(){
+        $(this).fadeOut();
+    });
+});
+
+var allpara = document.querySelectorAll('p');
+[].forEach.call(allpara, function(para) {
+  para.addEventListener('click', showTooltip, false);//adding eventlistener 'click' to show tooltip buttons block on element('p') click 
+});
+
+var tooltip = document.getElementById('tooltip');
+
+function showTooltip(e) {
+  tooltip.style.display = 'block';//tooltip design in 'block' shape
+}
+
+
+var tooltipOptions = document.querySelectorAll('.tooltip-option');
+[].forEach.call(tooltipOptions, function(options) {
+  options.addEventListener('click', function(e) {
+    console.log(e.target.id);//this will take id from respective buttons clicked by the user's choice
+    document.execCommand(this.id);//this will execute command as per the selection from tooltip like B,I,U,undo
+    document.desighnMode='on';
+  }, false);
+});
+</script>
+</body>
+</html>
